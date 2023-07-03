@@ -11,6 +11,7 @@ type Service interface {
 	SaveSite(chatID int64, site string) string
 	GetSites(chatID int64) []string
 	DeleteSite(chatID int64, site string) string
+	SaveUser(chatID int64, token string) string
 }
 
 type service struct {
@@ -47,4 +48,12 @@ func (s *service) DeleteSite(chatID int64, site string) string {
 	}
 
 	return messages.URLDELETED
+}
+
+func (s *service) SaveUser(chatID int64, token string) string {
+	err := s.storage.SaveUser(chatID, token)
+	if err != nil {
+		return err.Error()
+	}
+	return token
 }

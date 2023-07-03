@@ -62,3 +62,30 @@ func (d *DB) Delete(chatID int64, site string) error {
 
 	return nil
 }
+
+
+func (d *DB) SaveUser(chatID int64, token string) error {
+	query := fmt.Sprintf("select exists (select * from users where chatid=%d)", chatID)
+	var exists bool 
+
+	err := d.DB.QueryRow(context.Background(), query).Scan(&exists)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		query = fmt.Sprintf("update users set token = '%s' where chatid=%d", token, chatID)
+		_, err := d.DB.Query(context.Background(), query)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	query = fmt.Sprintf("insert into users values(%d, '%s')", chatID, token)
+	_, err = d.DB.Query(context.Background(), query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
